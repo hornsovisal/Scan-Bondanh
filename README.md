@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Py-Scan: Network Scanning & Security Assessment Tool
 
 **Py-Scan** is a lightweight, educational, and multi-threaded network scanning tool written in Python. It is designed to perform essential network reconnaissance, including host discovery, detailed port scanning, and service detection, providing clear reports for system administrators and cybersecurity students.
@@ -86,3 +87,8 @@ Export to Sheets
 **Course:** Python for Cyber Security
 
 **Department:** Telecom and Networking, Cyber Security, CADT
+=======
+# PyScan
+A Network Scanner Tool based on Python 
+>>>>>>> 0f7b56c4494a33086e8d0ecc23e9db6d041659c1
+# PyScan
