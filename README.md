@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Py-Scan: Network Scanning & Security Assessment Tool
 
 **Py-Scan** is a lightweight, educational, and multi-threaded network scanning tool written in Python. It is designed to perform essential network reconnaissance, including host discovery, detailed port scanning, and service detection, providing clear reports for system administrators and cybersecurity students.
@@ -41,17 +40,7 @@ You must have Python 3.x installed. You may also need to run the tool with eleva
 
 ### Basic Usage
 
-Run the main command-line interface script with an IP range and optional ports:
 
-**Bash**
-
-```
-# Scan a single host for a list of common ports
-python py_scan_tool/main_cli.py --target 192.168.1.1 --ports default
-
-# Scan a subnet for specific ports (22, 80, 443)
-python py_scan_tool/main_cli.py --target 192.168.1.0/24 --ports 22,80,443 --output-format txt
-```
 
 ---
 
@@ -87,9 +76,3 @@ Export to Sheets
 **Course:** Python for Cyber Security
 
 **Department:** Telecom and Networking, Cyber Security, CADT
-=======
-# PyScan
-A Network Scanner Tool based on Python 
->>>>>>> 0f7b56c4494a33086e8d0ecc23e9db6d041659c1
-# PyScan
-# PyScan
