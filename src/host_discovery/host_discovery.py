@@ -135,11 +135,8 @@ class BaseScanner(ABC):
 
         # If all methods fail, return the IP
         return ip
-
-    def generate_ip_range(self, base_ip, start_host, end_host):
-        return [f"{base_ip}.{i}" for i in range(start_host, end_host + 1)]
     
-    def generate_ip_range_full(self, start_ip, end_ip):
+    def generate_ip_range(self, start_ip, end_ip):
         """Generate IP range from start_ip to end_ip (e.g., '10.12.0.1' to '10.12.3.254')"""
         def ip_to_int(ip):
             parts = ip.split('.')
@@ -327,9 +324,22 @@ class HostScanner:
         results.sort(key=lambda x: tuple(int(part) for part in x[0].split(".")))
         return results
 
-    def display(self, ip_range, method="auto", max_workers=50, alive_only=True):
+    def scan(self, ip_range, method="auto", max_workers=50, alive_only=True, show_progress=True):
+        """Scan hosts and cache results. Returns results list."""
         print(f"\nStarting scan of {len(ip_range)} IPs...\n")
-        results = self.scan_hosts(ip_range, method, max_workers, show_progress=True, alive_only=alive_only)
+        self._cached_results = self.scan_hosts(ip_range, method, max_workers, show_progress=show_progress, alive_only=alive_only)
+        return self._cached_results
+    
+    def get_cached_results(self):
+        """Get cached scan results without re-scanning"""
+        return self._cached_results
+    
+    def display(self, ip_range=None, method="auto", max_workers=50, alive_only=True):
+        """Display scan results. If ip_range is None, uses cached results."""
+        if ip_range is not None:
+            results = self.scan(ip_range, method, max_workers, alive_only)
+        else:
+            results = self._cached_results
         
         print(f"\n{'='*120}")
         print(f"Found {len(results)} alive host(s)")
@@ -341,16 +351,14 @@ class HostScanner:
             print(f"{ip:<16} {status:<8} {identity:<25} {ping_time:<8} {mac:<18} {ports:<30}")
         
         print("="*120)
+        return results
 
 
 if __name__ == "__main__":
     scanner = HostScanner()
     
-    # Method 1: Single subnet range
-    # sample_range = scanner.icmp.generate_ip_range("10.12.3", 1, 254)
-    
     # Method 2: Cross-subnet range (e.g., 10.12.0.1 to 10.12.3.0)
-    sample_range = scanner.icmp.generate_ip_range_full("10.12.0.1", "10.12.3.254")
+    sample_range = scanner.icmp.generate_ip_range("10.12.0.1", "10.12.3.254")
     
     scanner.display(sample_range, method="auto")
 
