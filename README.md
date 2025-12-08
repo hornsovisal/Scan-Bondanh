@@ -1,6 +1,6 @@
-# Py-Scan: Network Scanning & Security Assessment Tool
+# Scan-Bondanh: Network Scanning & Security Assessment Tool
 
-**Py-Scan** is a lightweight, educational, and multi-threaded network scanning tool written in Python. It is designed to perform essential network reconnaissance, including host discovery, detailed port scanning, and service detection, providing clear reports for system administrators and cybersecurity students.
+**Scan-Bondanh** is a lightweight, educational, and multi-threaded network scanning tool written in Python. It is designed to perform essential network reconnaissance, including host discovery, detailed port scanning, and service detection, providing clear reports for system administrators and cybersecurity students.
 
 ---
 
