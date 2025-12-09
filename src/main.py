@@ -41,6 +41,7 @@ def main():
         # This will print progress and return details for alive hosts
         raw_results = scanner.scan(ip_range_list, method="auto", alive_only=True, show_progress=True)
         hosts = [result[0] for result in raw_results]
+        
         #function to display results
         scanner.display(ip_range=None, method="auto", alive_only=True)
         
