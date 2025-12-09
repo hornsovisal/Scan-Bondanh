@@ -3,11 +3,9 @@ import os
 
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-
-from host_discovery.host_discovery import HostScanner
-
-#initialize scanner
-banner = banner = r"""
+from host_discovery.host_discovery import HostScanner        
+def main():
+    banner = banner = r"""
 ███████╗ ██████╗ █████╗ ███╗   ██╗    ██████╗  ██████╗ ███╗   ██╗██████╗  █████╗ ███╗   ██╗██╗  ██╗
 ██╔════╝██╔════╝██╔══██╗████╗  ██║    ██╔══██╗██╔═══██╗████╗  ██║██╔══██╗██╔══██╗████╗  ██║██║  ██║
 ███████╗██║     ███████║██╔██╗ ██║    ██████╔╝██║   ██║██╔██╗ ██║██║  ██║███████║██╔██╗ ██║███████║
@@ -17,63 +15,62 @@ banner = banner = r"""
                                                                                                    
                                        
 """
-def main():
     print(banner)
-    print("======== Scan Bondanh ========")
-    print("[1] Host Discovery")
-    print("[2] Port Scanning")
-    print("[3] Exit")
-    print("==============================")
-
-    choice = input("Choose an option (1, 2, 3): ").strip()
     hosts = []
     results = {}
-    #Host Discovery
+
+    while True:
+        print("\n======== Scan Bondanh ========")
+        print("[1] Host Discovery")
+        print("[2] Port Scanning")
+        print("[3] Exit")
+        print("==============================")
+
+        choice = input("Choose an option (1, 2, 3): ").strip()
+        
     
-    if choice == "1":
-        scanner = HostScanner()
-        start_ip = input("Enter start IP (ex: 192.168.1.1): ").strip()
-        end_ip = input("Enter end IP (ex: 192.168.1.254): ").strip()
+        match choice:
+            case "1":
+                # Host Discovery Logic
+                scanner = HostScanner()
+                start_ip = input("Enter start IP (ex: 192.168.1.1): ").strip()
+                end_ip = input("Enter end IP (ex: 192.168.1.254): ").strip()
 
-        try:
-            # Validate IP format
-            for ip in [start_ip, end_ip]:
-                parts = ip.split('.')
-                if len(parts) != 4 or not all(part.isdigit() and 0 <= int(part) <= 255 for part in parts):
-                    raise ValueError(f"Invalid IP format: {ip}")
+                try:
+                    # Validate IP format
+                    for ip in [start_ip, end_ip]:
+                        parts = ip.split('.')
+                        if len(parts) != 4 or not all(part.isdigit() and 0 <= int(part) <= 255 for part in parts):
+                            raise ValueError(f"Invalid IP format: {ip}")
+                    
+                    # Assuming scanner.icmp.generate_ip_range is a valid method path
+                    ip_range_list = scanner.icmp.generate_ip_range(start_ip, end_ip) 
+                    
+                except ValueError as e:
+                    print(f"Invalid IP format. Please use valid IP addresses (e.g., 192.168.1.1).")
+                    print(f"Error: {e}")
+                    # Continue the loop to show the menu again
+                    continue 
+                
+                print(f"Scanning IP range: {start_ip} to {end_ip}...")
+                scanner.display(ip_range_list, method="arp")
+
+           
+                print("\nScan complete.")
+                
+            case "2":
+                
+                print("Port Scanning functionality is not yet implemented.")
+                pass
+
+            case "3":
+                
+                print(" Exiting Scan Bondanh. Goodbye!")
+                return 
             
-            ip_range_list = scanner.icmp.generate_ip_range(start_ip, end_ip)
-            
-        except ValueError as e:
-            print(f"Invalid IP format. Please use valid IP addresses (e.g., 192.168.1.1).")
-            print(f"Error: {e}")
-            return
+            case _:
+              
+                print(f"Invalid option: '{choice}'. Please choose 1, 2, or 3.")
         
-        print(f"Scanning IP range: {start_ip} to {end_ip}...")
-        scanner.display(ip_range_list,method="arp")
-        
-
-    #Port Scanning
-
-    elif choice == "2":
-        pass
-    elif choice == "3":
-        print(" Exiting Scan Bondanh. Goodbye!")
-        return
-    else:
-        print("Invalid option. Exiting.")
-        return
-
-
-    #report 
-
-    print("\nScan complete.")
-    save = input("Generate report? (Y/N): ").strip().lower()
-
-    if save == "y":
-        pass
-    else:
-        pass
-
 if __name__ == "__main__":
     main()
