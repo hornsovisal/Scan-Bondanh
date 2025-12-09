@@ -158,5 +158,54 @@ class PortScanner:
 # ✅ MAIN PROGRAM (Creates the object and runs it)
 # -------------------------------------------------
 if __name__ == "__main__":
+
     scanner = PortScanner()
     scanner.run_interactive()
+    user_input = input("Enter target Public IP or Domain: ").strip()
+
+    # Convert domain → IP
+    ip = resolve_target(user_input)
+
+    if ip is None:
+        print("❌ Invalid domain or IP.")
+        exit()
+
+    # Block private IPs
+    if is_private_ip(ip):
+        print("❌ Private IP detected → Ignoring. Only public IP allowed.")
+        exit()
+
+    print(f"Resolved Target IP: {ip}")
+
+    # Load ports from defaultport.json
+    ports = load_ports()
+    if not ports:
+        print("❌ Port list empty. Check defaultport.json")
+        exit()
+
+    # Ask user which scan mode
+    mode = input("\nChoose scan mode:\n1 = Built-in scanner\n2 = Nmap\n> ")
+
+    if mode == "2":
+        nmap_scan(ip)
+    else:
+        results = port_scan(ip, ports)
+
+        print("\n--- Scan Results ---\n")
+        for port, status, banner in results:
+            if status == "OPEN":
+                print(f"[+] Port {port} OPEN")
+                if banner:
+                    print(f"    Banner: {banner}")
+
+
+    print("\n--- Scan Results ---\n")
+    for port, status, service, banner in results:
+        if status == "OPEN":
+            print(f"[+] Port {port} OPEN ({service})")
+            if banner:
+                print(f"    Banner: {banner}")
+        # To show closed and filtered ports, uncomment:
+        # else:
+        #     print(f"Port {port}: {status}")
+
