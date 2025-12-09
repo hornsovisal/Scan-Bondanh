@@ -1,0 +1,10 @@
+python-docx
+socket
+json
+os
+platform
+socket
+subprocess
+sys
+datetime
+abc
