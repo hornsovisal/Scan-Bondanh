@@ -12,7 +12,6 @@
 * **Customizable:** Scan behavior is controlled via external configuration files (`.json`, `.yaml`).
 * **Reporting:** Generates structured, machine-readable **JSON** and human-readable **TXT** reports.
 * **Modular Architecture:** Built using an Object-Oriented Programming (OOP) approach for easy testing and future expansion.
-🤝
 ---
 
 ##  Project Setup
@@ -44,41 +43,33 @@ You must have Python 3.x installed. You may also need to run the tool with eleva
 ````
   ## 🧩 Basic Usage
 
-  To start **Scan-Bondanh**, simply run the main script:
-
-  ```bash
-  python3 main.py
-  ````
-
-  Once executed, the tool displays an ASCII banner followed by the main menu:
-  
-  ```
-  ======== Scan Bondanh ========
-  [1] Host Discovery
-  [2] Port Scanning
-  [3] What is my IP?
-  [4] Exit
-  ==============================
-  Choose an option (1, 2, 3):
-  ```
-
-  ### 🔎 1. Host Discovery
-  
-  Select this option to scan a network for active hosts.
-  You will be prompted to enter an IP range (for example, `192.168.1.1-192.168.1.254`), and the tool will list all reachable devices on that network.
-  
-  ### 🚪 2. Port Scanning
-  
-  Use this option to check for open ports on a specific target.
-  You will be asked to enter a target IP or domain (e.g., `cadt.edu.kh`), and the scanner will test common or specified ports to identify what services are running.
-  
-  ### 🌐 3. What is my IP?
-  
-  Displays your **IP address** and may also show additional local network information.
-  
-  ### ❌ 4. Exit
-  
-  Closes the program.
+    To start **Scan-Bondanh**, simply run the main script:
+    ```bash
+    python3 main.py
+    ````
+    Once executed, the tool displays an ASCII banner followed by the main menu:
+    ```
+    ======== Scan Bondanh ========
+    [1] Host Discovery
+    [2] Port Scanning
+    [3] What is my IP?
+    [4] Exit
+    ==============================
+    Choose an option (1, 2, 3):
+    ```
+    ### 🔎 1. Host Discovery
+    Select this option to scan a network for active hosts.
+    You will be prompted to enter an IP range (for example, `192.168.1.1-192.168.1.254`), and the tool will list all reachable devices on that network.
+    
+    ### 🚪 2. Port Scanning
+    Use this option to check for open ports on a specific target.
+    You will be asked to enter a target IP or domain (e.g., `cadt.edu.kh`), and the scanner will test common or specified ports to identify what services are running.
+    
+    ### 🌐 3. What is my IP?
+    Displays your **IP address** and may also show additional local network information.
+    
+    ### ❌ 4. Exit
+    Closes the program.
 
 
 ## 🧱 Project Structure
