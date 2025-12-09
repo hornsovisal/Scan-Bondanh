@@ -44,6 +44,7 @@ You must have Python 3.x installed. You may also need to run the tool with eleva
     python3 main.py
     ```
   Once executed, the tool displays an ASCII banner followed by the main menu:
+    
     ```
     ======== Scan Bondanh ========
     [1] Host Discovery
