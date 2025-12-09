@@ -148,3 +148,16 @@ if __name__ == "__main__":
                     print(f"    Banner: {banner}")
 
 
+<<<<<<< HEAD
+=======
+    print("\n--- Scan Results ---\n")
+    for port, status, service, banner in results:
+        if status == "OPEN":
+            print(f"[+] Port {port} OPEN ({service})")
+            if banner:
+                print(f"    Banner: {banner}")
+        # To show closed and filtered ports, uncomment:
+        # else:
+        #     print(f"Port {port}: {status}")
+
+>>>>>>> 6dcfe1f (CLI)
