@@ -65,8 +65,8 @@ def main():
                     report_manager = HostReportManager(output_dir=report_dir)
                     report_manager.scanner = scanner  # Use the same scanner with cached results
                     report_manager.load_from_cached_scan()  # Load results from cache without re-scanning
-                    report_manager.display_summary()  # Show summary
-                    report_manager.generate_report()  # Generate and save DOCX report
+                    report_manager.display_summary()  # display the result
+                    report_manager.generate_report()  # Generate report and save as docx
                     print("Report generated successfully.")
                 else:
                     print("Report generation skipped.")
