@@ -149,6 +149,7 @@ if __name__ == "__main__":
 
 
 <<<<<<< HEAD
+=======
     print("\n--- Scan Results ---\n")
     for port, status, service, banner in results:
         if status == "OPEN":
@@ -159,5 +160,4 @@ if __name__ == "__main__":
         # else:
         #     print(f"Port {port}: {status}")
 
-=======
->>>>>>> f81ff84ae6b75cb0a2ce0fdffe4cd7da34187213
+>>>>>>> 6dcfe1f (CLI)
