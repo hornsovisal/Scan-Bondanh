@@ -9,7 +9,44 @@ from src.reportings.report_manager import HostReportManager
 from src.IP_Finding.ip_find import IPConfig
 from src.port_scanning.port_scanning import PortScanner
 
+def clear_terminal():
+    # Prompt the user explicitly and avoid silently defaulting to 'yes'.
+    while True:
+        try:
+            # Print prompt and flush to ensure it appears before input()
+            prompt = "Clear screen? (Y/N) [Y]: "
+            choice = input(prompt).strip().lower()
+        except EOFError:
+            # If input is not available, do not clear.
+            return
 
+        if choice == '':
+            choice = 'y'
+        if choice in ('y', 'n'):
+            break
+        print("Please enter 'Y' or 'N'.")
+
+    if choice == 'y':
+        try:
+            input("Press Enter to continue...")
+        except EOFError:
+            # If the terminal doesn't support input, just attempt to clear.
+            pass
+
+        # Prefer calling the system clear command which works reliably on most shells
+        try:
+            if os.name == 'nt':
+                rc = os.system('cls')
+            else:
+                rc = os.system('clear')
+            # If the system call failed (non-zero), fall back to ANSI sequence
+            if rc != 0:
+                print("\033c", end="", flush=True)
+        except Exception:
+            try:
+                print("\033c", end="", flush=True)
+            except Exception:
+                pass
 
 def main():
     banner = banner = r"""
@@ -20,9 +57,8 @@ def main():
 ███████║╚██████╗██║  ██║██║ ╚████║    ██████╔╝╚██████╔╝██║ ╚████║██████╔╝██║  ██║██║ ╚████║██║  ██║
 ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝    ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝
                                                                                                    
-
 """
-    # print(banner)
+    
     
     while True:
         print(banner)
@@ -85,18 +121,11 @@ def main():
                         project_by= "Scan Bondanh Team - Horn Sovisal , Kuyseng Marakat , Chhit sovathana"
                     )
                     print("✓ Professional report generated successfully!")
+                    clear_terminal()
                 else:
                     print("Report generation skipped.")
-                # Wait for user to press Enter (handle non-interactive runs)
-                try:
-                    input("Press Enter to continue...")
-                except EOFError:
-                    pass
-                # Prefer ANSI clear for portability, fall back to os.system
-                try:
-                    print("\033c", end="")
-                except Exception:
-                    os.system('cls' if os.name == 'nt' else 'clear')
+                    clear_terminal()
+                
             case "2":
                 try:
                     scanner = PortScanner()
@@ -129,15 +158,7 @@ def main():
                     print("\nPort scan interrupted.")
                 except Exception as e:
                     print(f"Error running port scanner: {e}")
-                # Wait and clear like option 1
-                try:
-                    input("Press Enter to continue...")
-                except EOFError:
-                    pass
-                try:
-                    print("\033c", end="")
-                except Exception:
-                    os.system('cls' if os.name == 'nt' else 'clear')
+                clear_terminal()
             case "3":
                 try:
                     ip_config = IPConfig()
