@@ -77,13 +77,12 @@ def main():
                     report_manager = HostReportManager(output_dir=report_dir)
                     report_manager.scanner = scanner  # Use the same scanner with cached results
                     report_manager.load_from_cached_scan()  # Load results from cache without re-scanning
-                    report_manager.display_summary()  # display the result
                     
                     # Generate professional report with custom metadata
                     report_manager.generate_report(
                         customer_name=customer_name,
                         network_range=network_range,
-                        project_by= "Scan Bondanh Team "
+                        project_by= "Scan Bondanh Team - Horn Sovisal , Kuyseng Marakat , Chhit sovathana"
                     )
                     print("✓ Professional report generated successfully!")
                 else:

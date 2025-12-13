@@ -42,11 +42,6 @@ class ReportManager(ABC):
         """Abstract method - must be implemented by subclasses (polymorphism)"""
         pass
     
-    @abstractmethod
-    def display_summary(self):
-        """Abstract method - display summary of data"""
-        pass
-    
     def _get_filename(self, prefix, extension='txt'):
         """Protected method to generate timestamped filename"""
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
