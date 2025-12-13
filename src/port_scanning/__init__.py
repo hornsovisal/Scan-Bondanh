@@ -1,22 +1,7 @@
-"""Port scanning module for network security assessment."""
+"""Port scanning package exports."""
 
-from .port_scanning import (
-    load_ports,
-    is_private_ip,
-    resolve_target,
-    grab_banner,
-    scan_port,
-    port_scan,
-    nmap_scan
-)
+from .port_scanning import PortScanner
 
 __all__ = [
-    'load_ports',
-    'is_private_ip',
-    'resolve_target',
-    'grab_banner',
-    'scan_port',
-    'port_scan',
-    'nmap_scan'
+    'PortScanner',
 ]
-#

@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 from src.host_discovery.host_discovery import HostScanner
 from src.reportings.report_manager import HostReportManager
 from src.IP_Finding.ip_find import IPConfig
+from src.port_scanning.port_scanning import PortScanner
 
 
 
@@ -86,9 +87,22 @@ def main():
                 except Exception:
                     os.system('cls' if os.name == 'nt' else 'clear')
             case "2":
-                
-                print("Port Scanning functionality is not yet implemented.")
-                pass
+                try:
+                    scanner = PortScanner()
+                    scanner.run()
+                except KeyboardInterrupt:
+                    print("\nPort scan interrupted.")
+                except Exception as e:
+                    print(f"Error running port scanner: {e}")
+                # Wait and clear like option 1
+                try:
+                    input("Press Enter to continue...")
+                except EOFError:
+                    pass
+                try:
+                    print("\033c", end="")
+                except Exception:
+                    os.system('cls' if os.name == 'nt' else 'clear')
             case "3":
                 try:
                     ip_config = IPConfig()
