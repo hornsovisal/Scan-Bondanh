@@ -9,6 +9,7 @@ from pathlib import Path # use to handle file and directory paths in a clean, es
 from datetime import datetime # use to get the current date
 from concurrent.futures import ThreadPoolExecutor, as_completed #use to run port scans in parallel using multiple threads
 from typing import List, Tuple   # this will return value is a list of (port, status)
+from docx import Document # This use to save the result in docx format
 
 
 # --- Color the output so that it's more readable ---
@@ -49,8 +50,13 @@ class BaseScanner:
         self.__timeout = timeout
 
         # Create a main output folder to store scan results
-        self.__output_dir = Path.cwd() / "scanner_results"
-        self.__output_dir.mkdir(parents=True, exist_ok=True)
+        base_dir = Path(__file__).resolve().parents[1]  # src/
+        self.__output_dir = base_dir / "reportings" / "reports"
+        if not self.__output_dir.exists():
+            raise FileNotFoundError(
+                f"Required folder does not exist: {self.__output_dir}"
+            )
+
 
 # --- Methods ---
     def resolve_target(self, target: str) -> str | None:
@@ -84,60 +90,72 @@ class BaseScanner:
         ]
         return any(re.match(p, ip) for p in patterns)
 
+
     def save_results(self, results, ip):
         """
-        Save scan results into a clean folder structure.
-
-        Each scan has its own folder containing:
-        - result.json
-        - result.csv
-        - summary.txt: this one will be faster if you want to only look for which ports are open. 
+        Save port scan results in Nmap-style summary format
+        directly into:
+        src/reportings/reports/
         """
-        timestamp = readable_time()
 
-        # Create one folder per scan using the timestamp
-        scan_dir = self.__output_dir / f"scan_{timestamp}"
-        scan_dir.mkdir(parents=True, exist_ok=True)
+    # --- Timestamp ---
+        timestamp = datetime.now().strftime("%b-%d-%Y_%I-%M-%S_%p")
 
-        json_path = scan_dir / "result.json"
-        csv_path = scan_dir / "result.csv"
-        summary_path = scan_dir / "summary.txt"
+    # --- Reports directory (already exists) ---
+        reports_dir = Path(__file__).resolve().parents[1] / "reportings" / "reports"
 
-        # ---JSON ---
-        # Save results in JSON format 
-        with json_path.open("w", encoding="utf-8") as jf:
-            json.dump(
-                {
-                    "ip": ip,
-                    "timestamp": timestamp,
-                    "results": [{"port": p, "status": s} for p, s in results]
-                },
-                jf,
-                indent=2
-            )
+        report_path = reports_dir / f"port_scanning_{timestamp}.docx"
 
-        # --- CSV ---
-        # Save results in CSV format for spreadsheet usage
-        with csv_path.open("w", newline="", encoding="utf-8") as cf:
-            writer = csv.writer(cf)
-            writer.writerow(["port", "status"])
-            writer.writerows(results)
+    # --- Service & Risk mapping ---
+        SERVICE_MAP = {
+           21: ("FTP", "High"),
+           22: ("SSH", "High"),
+           80: ("HTTP", "Medium"),
+           443: ("HTTPS", "Low"),
+           27017: ("MongoDB", "High"),
+        }
 
-        # --- SUMMARY ---
-        # Create a human-readable summary file
-        open_ports = [str(p) for p, s in results if s == "OPEN"]
 
-        with summary_path.open("w", encoding="utf-8") as sf:
-            sf.write("Port Scan Summary\n")
-            sf.write("=================\n\n")
-            sf.write(f"Target IP   : {ip}\n")
-            sf.write(f"Scan Time  : {timestamp}\n")
-            sf.write(f"Total Ports: {len(results)}\n")
-            sf.write(f"Open Ports : {', '.join(open_ports) if open_ports else 'None'}\n")
+    # --- Create DOCX ---
+        doc = Document()
+        doc.add_heading("Scan Summary (Nmap-style)", level=1)
 
-        print(f"\n✅ Results saved in folder:")
-        print(f"   {scan_dir}")
+        doc.add_paragraph("-" * 75)
 
+    # --- Table header ---
+        table = doc.add_table(rows=1, cols=5)
+        hdr = table.rows[0].cells
+        hdr[0].text = "Host Name"
+        hdr[1].text = "IP Address"
+        hdr[2].text = "Open Port"
+        hdr[3].text = "Service"
+        hdr[4].text = "Risk"
+
+        try:
+           hostname = socket.gethostbyaddr(ip)[0]
+        except Exception:
+           hostname = "Unknown"
+
+    # --- Only OPEN ports ---
+        for port, status in results:
+            if status != "OPEN":
+               continue
+
+        service, risk = SERVICE_MAP.get(port, ("Unknown", "Unknown"))
+
+        row = table.add_row().cells
+        row[0].text = hostname
+        row[1].text = ip
+        row[2].text = str(port)
+        row[3].text = service
+        row[4].text = risk
+
+        doc.add_paragraph("-" * 75)
+
+        doc.save(report_path)
+
+        print("\n✅ Nmap-style report saved successfully:")
+        print(f"   {report_path}")
 
     # using gettter to access to private attributes
     def get_workers(self):
@@ -145,6 +163,48 @@ class BaseScanner:
 
     def get_timeout(self):
         return self.__timeout
+    
+    def print_nmap_summary(host, ip, results):
+        print("\nScan Summary (Nmap-style)\n")
+        print("-" * 75)
+
+        print(
+            f"{'Host Name':<15}"
+            f"{'IP Address':<18}"
+            f"{'Open Ports':<15}"
+            f"{'Services':<18}"
+            f"{'Risk'}"
+        )
+
+        print("-" * 75)
+
+        found = False
+
+        for port, status in results:
+            if status == "OPEN":
+               found = True
+
+            # simple service mapping
+            service_map = {
+                80: ("HTTP", "Medium"),
+                443: ("HTTPS", "Low"),
+            }
+
+            service, risk = service_map.get(port, ("Unknown", "Low"))
+
+            print(
+                f"{host:<15}"
+                f"{ip:<18}"
+                f"{port:<15}"
+                f"{service:<18}"
+                f"{risk}"
+            )
+
+        if not found:
+           print("No open ports found.")
+
+        print("-" * 75)
+
 
 
 # =====================================================
@@ -222,12 +282,18 @@ class PortScanner(BaseScanner):
         results = self.scan_ports(ip)
 
         # Display results in the terminal
-        print("\n--- Scan Results ---\n")
+        print("\nPORT     STATE")
+        print("--------------")
+
+        open_found = False
+
         for port, status in results:
             if status == "OPEN":
-                print(f"{Fore.GREEN}[+] Port {port} OPEN{Fore.RESET}")
-            else:
-                print(f"{Fore.RED}[-] Port {port} {status}{Fore.RESET}")
+               open_found = True
+               print(f"{port}/tcp  open")
+
+        if not open_found:
+            print("No open ports found.")
 
         # Ask user whether to save results
         if input("\nSave results? (y/N): ").lower() == "y":
