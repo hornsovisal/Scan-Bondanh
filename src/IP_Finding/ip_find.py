@@ -1,4 +1,5 @@
 import netifaces
+import socket
 class IPConfig():
     """IP Configuration class  to display network interface information."""
 
