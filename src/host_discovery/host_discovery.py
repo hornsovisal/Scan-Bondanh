@@ -17,52 +17,29 @@ except ImportError:  # pragma: no cover - optional dependency
 class BaseScanner(ABC):
     def __init__(self):
         self._ports = self._load_ports()
-        self._hostname_cache = self._load_hostname_cache()
         if SCAPY_AVAILABLE:
             conf.verb = 0
 
     def _load_ports(self):
+        """Load port list from config file"""
         try:
-            # Try multiple path resolution strategies
             current_dir = os.path.dirname(os.path.abspath(__file__))
             project_root = os.path.dirname(os.path.dirname(current_dir))
             
-            # If that doesn't work, try from current working directory
             if not os.path.exists(os.path.join(project_root, "config")):
                 project_root = os.getcwd()
-                # Keep going up until we find the config dir
                 while project_root != "/" and not os.path.exists(os.path.join(project_root, "config")):
                     project_root = os.path.dirname(project_root)
             
             config_path = os.path.join(project_root, "config/default_ports.json")
             with open(config_path, "r", encoding="utf-8") as f:
-                lines = [line for line in f.read().splitlines() if not line.strip().startswith("/")]
-            data = json.loads("\n".join(lines))
+                data = json.load(f)
             return data.get("port_list_only", [80, 443])
         except Exception:
             return [80, 443]
-    
-    def _load_hostname_cache(self):
-        """Load custom hostname mappings from config/hostnames.json"""
-        try:
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            project_root = os.path.dirname(os.path.dirname(current_dir))
-            
-            # If that doesn't work, try from current working directory
-            if not os.path.exists(os.path.join(project_root, "config")):
-                project_root = os.getcwd()
-                # Keep going up until we find the config dir
-                while project_root != "/" and not os.path.exists(os.path.join(project_root, "config")):
-                    project_root = os.path.dirname(project_root)
-            
-            config_path = os.path.join(project_root, "config/hostnames.json")
-            with open(config_path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return {}
-    
 
     def _check_port(self, ip, port):
+        """Check if a port is open"""
         try:
             socket.create_connection((ip, port), timeout=0.5).close()
             return port
@@ -70,91 +47,24 @@ class BaseScanner(ABC):
             return None
 
     def scan_ports(self, ip):
+        """Scan ports on target IP"""
         with ThreadPoolExecutor(max_workers=20) as executor:
             futures = {executor.submit(self._check_port, ip, p): p for p in self._ports}
             open_ports = [future.result() for future in as_completed(futures) if future.result()]
         return ",".join(map(str, sorted(open_ports))) if open_ports else "None"
 
     def resolve_identity(self, ip):
-        """Resolve hostname using multiple methods like Angry IP Scanner."""
-        # Method 0: Check custom hostname cache first (highest priority)
-        if ip in self._hostname_cache:
-            return self._hostname_cache[ip]
-        
-        # Method 1: Check /etc/hosts (fast)
+        """Resolve hostname using DNS lookup"""
         try:
-            with open('/etc/hosts', 'r') as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith('#'):
-                        parts = line.split()
-                        if len(parts) >= 2 and parts[0] == ip:
-                            return parts[1].split('.')[0]
-        except Exception:
-            pass
-        
-        # Method 2: Try reverse DNS lookup
-        try:
-            hostname, aliases, _ = socket.gethostbyaddr(ip)
+            hostname, _, _ = socket.gethostbyaddr(ip)
             if hostname and hostname != ip:
-                short_name = hostname.split('.')[0] if '.' in hostname else hostname
-                return short_name if short_name else hostname
-        except socket.herror:
-            pass
-        except socket.timeout:
-            pass
-        except Exception:
-            pass
-
-        # Method 3: Try using getfqdn as fallback
-        try:
-            fqdn = socket.getfqdn(ip)
-            if fqdn and fqdn != ip and not fqdn.startswith(ip):
-                short_name = fqdn.split('.')[0] if '.' in fqdn else fqdn
-                return short_name if short_name else fqdn
-        except Exception:
-            pass
-
-        # Method 4: Try NetBIOS lookup (Windows networks)
-        try:
-            result = subprocess.check_output(
-                ["nmblookup", "-A", ip],
-                stderr=subprocess.DEVNULL,
-                timeout=3,
-                text=True
-            )
-            for line in result.splitlines():
-                if "<00>" in line and "GROUP" not in line:
-                    parts = line.split()
-                    if parts and parts[0] != ip:
-                        return parts[0].strip()
-        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError):
-            pass
-        except Exception:
-            pass
-
-        # Method 5: Try mDNS/Avahi (for .local domains)
-        try:
-            result = subprocess.check_output(
-                ["avahi-resolve", "-a", ip],
-                stderr=subprocess.DEVNULL,
-                timeout=2,
-                text=True
-            )
-            parts = result.strip().split()
-            if len(parts) >= 2 and parts[1] != ip:
-                hostname = parts[1].replace('.local', '')
                 return hostname.split('.')[0] if '.' in hostname else hostname
-        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError):
-            pass
         except Exception:
             pass
-
-        # If all methods fail, return the IP
         return ip
     
     def generate_ip_range(self, start_ip, end_ip):
-        """Generate IP range from start_ip to end_ip (e.g., '10.12.0.1' to '10.12.3.254')"""
+        """Generate IP range from start_ip to end_ip"""
         def ip_to_int(ip):
             parts = ip.split('.')
             return (int(parts[0]) << 24) + (int(parts[1]) << 16) + (int(parts[2]) << 8) + int(parts[3])
@@ -169,6 +79,7 @@ class BaseScanner(ABC):
 
     @abstractmethod
     def ping(self, ip):
+        """Abstract method to be implemented by subclasses"""
         pass
 
 

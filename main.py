@@ -5,7 +5,7 @@ import os
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 from src.host_discovery.host_discovery import HostScanner
-from src.reportings.report_manager import HostReportManager
+from src.reportings.report_manager import HostReportManager, PortReportManager
 from src.IP_Finding.ip_find import IPConfig
 from src.port_scanning.port_scanning import PortScanner
 
@@ -59,7 +59,6 @@ def main():
                                                                                                    
 """
     
-    
     while True:
         print(banner)
         print("\n======== Scan Bondanh ========")
@@ -109,7 +108,8 @@ def main():
                     
                     network_range = f"{start_ip} to {end_ip}"
                     # Create report manager and load cached scan results
-                    report_dir = os.path.join(os.path.dirname(__file__), 'src', 'reportings', 'reports')
+                    report_dir = os.path.join(os.path.dirname(__file__), 'reports', 'host_scanner')
+                    os.makedirs(report_dir, exist_ok=True)
                     report_manager = HostReportManager(output_dir=report_dir)
                     report_manager.scanner = scanner  # Use the same scanner with cached results
                     report_manager.load_from_cached_scan()  # Load results from cache without re-scanning
@@ -127,37 +127,101 @@ def main():
                     clear_terminal()
                 
             case "2":
-                try:
-                    scanner = PortScanner()
-                    result = scanner.run()
-                    if result:
-                        ip, results = result
-                        # Save results to reports directory (JSON + summary) similar to host flow
+                # Port Scanning Logic
+                print("\n=== Port Scanning ===")
+                target = input("Enter target (public IP or domain): ").strip()
+                
+                scanner = PortScanner()
+                ip = scanner.resolve_target(target)
+
+                # Validate target
+                if not ip:
+                    print("❌ Cannot resolve target.")
+                    clear_terminal()
+                    continue
+
+                # Block private IP addresses
+                if scanner.is_private_ip(ip):
+                    print("❌ Private IP detected. Scan blocked for security reasons.")
+                    clear_terminal()
+                    continue
+
+                print(f"✓ Resolved target → {ip}")
+                
+                # Perform port scan
+                print(f"\nScanning {ip}...")
+                results = scanner.scan_ports(ip)
+
+                # Display results in terminal
+                print(f"\n{'='*120}")
+                print(f"PORT SCAN RESULTS FOR {ip}")
+                print(f"{'='*120}\n")
+                
+                print(f"{'Port':<8}{'Protocol':<12}{'State':<12}{'Identified Banner / Fingerprint':<50}{'Risk':<12}{'Notes':<30}")
+                print("-" * 120)
+
+                open_found = False
+                for port, status, banner in results:
+                    if status == "OPEN":
+                        open_found = True
+                        port_info = scanner.get_port_info(port)
+                        risk_level, notes = scanner.classify_risk(port, banner)
+                        
+                        # Format display
+                        banner_display = banner if banner != "N/A" else f"N/A ({port_info['service']} Detected)"
+                        banner_display = banner_display[:48] + ".." if len(banner_display) > 50 else banner_display
+                        notes_display = notes[:28] + ".." if len(notes) > 30 else notes
+                        
+                        print(f"{port:<8}{port_info['protocol']:<12}{'OPEN':<12}{banner_display:<50}{risk_level:<12}{notes_display:<30}")
+
+                if not open_found:
+                    print("No open ports found.")
+
+                print("-" * 120)
+                
+                # Summary
+                open_count = sum(1 for _, status, _ in results if status == "OPEN")
+                print(f"\nSummary: {open_count} open port(s) detected out of {len(results)} scanned.")
+
+                # Generate report
+                print("\nScan complete.")
+                save = input("Generate report? (Y/N): ").strip().lower()
+                if save == 'y':
+                    try:
+                        # Get customer information
+                        customer_name = input("Enter Customer/Client Name: ").strip()
+                        if not customer_name:
+                            customer_name = "Network Security Assessment"
+                        
+                        # Get hostname
                         try:
-                            report_dir = os.path.join(os.path.dirname(__file__), 'src', 'reportings', 'reports')
-                            os.makedirs(report_dir, exist_ok=True)
-                            import json as _json
-                            from datetime import datetime as _dt
-                            ts = _dt.now().strftime('%Y%m%d_%H%M%S')
-                            json_path = os.path.join(report_dir, f"port_scan_{ts}.json")
-                            summary_path = os.path.join(report_dir, f"port_scan_{ts}_summary.txt")
-                            with open(json_path, 'w', encoding='utf-8') as jf:
-                                _json.dump({'ip': ip, 'timestamp': ts, 'results': [{'port': p, 'status': s} for p, s in results]}, jf, indent=2)
-                            open_ports = [str(p) for p, s in results if s == 'OPEN']
-                            with open(summary_path, 'w', encoding='utf-8') as sf:
-                                sf.write('Port Scan Summary\n')
-                                sf.write('=================\n\n')
-                                sf.write(f"Target IP   : {ip}\n")
-                                sf.write(f"Scan Time   : {ts}\n")
-                                sf.write(f"Total Ports : {len(results)}\n")
-                                sf.write(f"Open Ports  : {', '.join(open_ports) if open_ports else 'None'}\n")
-                            print(f"\nReport saved to: {report_dir}")
-                        except Exception as e:
-                            print(f"Failed to save port scan report: {e}")
-                except KeyboardInterrupt:
-                    print("\nPort scan interrupted.")
-                except Exception as e:
-                    print(f"Error running port scanner: {e}")
+                            import socket
+                            hostname = socket.gethostbyaddr(ip)[0]
+                        except:
+                            hostname = None
+                        
+                        # Create report manager
+                        report_dir = os.path.join(os.path.dirname(__file__), 'reports', 'port_scanner')
+                        os.makedirs(report_dir, exist_ok=True)
+                        
+                        report_mgr = PortReportManager(output_dir=report_dir)
+                        report_mgr.set_target_info(ip, hostname)
+                        
+                        # Add all results
+                        for port, status, banner in results:
+                            report_mgr.add_port_result(port, status, banner)
+                        
+                        # Generate report with customer name
+                        report_mgr.generate_report(
+                            customer_name=customer_name,
+                            project_by="Scan Bondanh Team - Horn Sovisal, Kuyseng Marakat, Chhit Sovathana"
+                        )
+                        print("✓ Professional report generated successfully!")
+                    except Exception as e:
+                        print(f"Error generating report: {e}")
+                else:
+                    print("Report generation skipped.")
+                
                 clear_terminal()
             case "3":
                 try:
