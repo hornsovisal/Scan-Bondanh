@@ -229,8 +229,8 @@ def main():
                     ip_config.display_ipv4()
                 except Exception as e:
                     print(f"Error displaying IP configuration: {e}")
+                clear_terminal()
             case "4":
-                
                 print(" Exiting Scan Bondanh. Goodbye!")
                 return 
             
