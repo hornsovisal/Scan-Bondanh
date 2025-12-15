@@ -1,0 +1,11 @@
+netifaces
+python-docx
+scapy
+colorama
+json
+sys
+re
+socket
+pathlib
+datetime
+typing
