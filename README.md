@@ -72,7 +72,15 @@ To start **Scan-Bondanh**, simply run the main script:
 `python3 main.py`
 Once executed, the tool displays an ASCII banner followed by the main menu:
 
-    ``  ======== Scan Bondanh ========     [1] Host Discovery     [2] Port Scanning     [3] What is my IP?     [4] Exit     ==============================     Choose an option (1, 2, 3):  ``
+    ```
+    ======== Scan Bondanh ========     
+    [1] Host Discovery    
+    [2] Port Scanning     
+    [3] What is my IP?     
+    [4] Exit     
+    ==============================     
+    Choose an option (1, 2, 3):  
+    ```
 
 ### 🔎 1. Host Discovery
 
