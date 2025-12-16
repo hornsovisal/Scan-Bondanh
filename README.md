@@ -82,7 +82,7 @@ The project is organized as a professional Python package (`py_scan_tool`) to en
 | **📁`reports/`**             | **Scan Output**                                            | Stores all generated scan reports.         |
 | └── 📄`scan_results_YYMMDD.pdf` | Example output file.                                             |                                            |
 | **📄`requirements.txt`**     | **Dependencies**                                           | List of all required Python libraries.     |
-| **📄`__init__py`**           | **Python Package**                                         | Mark a directory as a Python package.      |
+| **📄`setup_verify.py`**      | **Python code**                                         | make sure all dependency install properly |
 
 ---
 
