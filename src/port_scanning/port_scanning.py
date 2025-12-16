@@ -41,9 +41,7 @@ def readable_time() -> str:
     return datetime.now().strftime("%b-%d-%Y_%I-%M-%S_%p")
 
 
-# =====================================================
 # BASE CLASS (PARENT CLASS)
-# =====================================================
 class BaseScanner:
     def __init__(self, workers: int, timeout: float):
         # Private attributes

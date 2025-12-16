@@ -42,10 +42,10 @@ You must have Python 3.x installed. You may also need to run the tool with eleva
 ## 🧩 Basic Usage
 
 To start **Scan-Bondanh**, simply run the main script:
-`   python3 main.py   `
+`  python3 main.py  `
 Once executed, the tool displays an ASCII banner followed by the main menu:
 
-    ``    ======== Scan Bondanh ========     [1] Host Discovery     [2] Port Scanning     [3] What is my IP?     [4] Exit     ==============================     Choose an option (1, 2, 3):    ``
+    ``   ======== Scan Bondanh ========     [1] Host Discovery     [2] Port Scanning     [3] What is my IP?     [4] Exit     ==============================     Choose an option (1, 2, 3):   ``
 
 ### 🔎 1. Host Discovery
 
@@ -69,21 +69,20 @@ Closes the program.
 
 The project is organized as a professional Python package (`py_scan_tool`) to ensure modularity and clean separation of duties.
 
-| Directory/File                       | Purpose                                                            | Key Files/Notes                               |
-| ------------------------------------ | ------------------------------------------------------------------ | --------------------------------------------- |
-| **📁`src/`**                 | **The Core Python Package**(Source Code)                     | Contains all executable logic.                |
-| ├── 📁`host_discovery/`         | Handles **Host Detection**using ICMP, ARP, and TCP methods. | `icmp_ping.py`,`arp_scan.py`              |
-| ├── 📁`port_scanning/`          | Manages**Concurrency**and raw socket connections.            | `threaded_scanner.py`,`socket_handler.py` |
-| ├── 📁`reporting/`              | Handles**Report Generation**and file output.                 | `report_manager.py`,`json_writer.py`      |
-| ├── 📄**`main.py`**       | **Primary Entry Point (CLI or GUI)**                         | the entire scan process.                      |
-| **📁`config/`**              | **Tool Settings**                                            | External files to configure tool behavior.    |
-| ├── 📄`default_ports.json`      | List of commonly scanned ports (e.g., 80, 443, 22).                |                                               |
-| └── 📄`scanner_config.yaml`     | **Performance Settings**(thread count, timeouts, retries).   |                                               |
-|                                      |                                                                    |                                               |
-| **📁`reports/`**             | **Scan Output**                                              | Stores all generated scan reports.            |
-| └── 📄`scan_results_YYMMDD.pdf` | Example output file.                                               |                                               |
-| **📄`requirements.txt`**     | **Dependencies**                                             | List of all required Python libraries.        |
-| **📄`__init__py`**           | **Python Package**                                           | Mark a directory as a Python package.         |
+| Directory/File                       | Purpose                                                          | Key Files/Notes                            |
+| ------------------------------------ | ---------------------------------------------------------------- | ------------------------------------------ |
+| **📁`src/`**                 | **The Core Python Package**(Source Code)                   | Contains all executable logic.             |
+| ├── 📁`host_discovery/`         | Handles**Host Detection**using ICMP, ARP, and TCP methods. | host_discovery.py                          |
+| ├── 📁`port_scanning/`          | Manages**Concurrency**and raw socket connections.          | `port_discovery.py`                      |
+| ├── 📁`reporting/`              | Handles**Report Generation**and file output.               | `report_manager.py`                      |
+| ├── 📁`IP_Finding/`             | handole find IP function                                         | ip_finding.py                              |
+| ├── 📄**`main.py`**       | **Primary Entry Point (CLI or GUI)**                       | the entire scan process.                   |
+| 📁`config/`                        | **Tool Settings**                                          | External files to configure tool behavior. |
+| ├── 📄`default_ports.json`      | List of commonly scanned ports (e.g., 80, 443, 22).              |                                            |
+| **📁`reports/`**             | **Scan Output**                                            | Stores all generated scan reports.         |
+| └── 📄`scan_results_YYMMDD.pdf` | Example output file.                                             |                                            |
+| **📄`requirements.txt`**     | **Dependencies**                                           | List of all required Python libraries.     |
+| **📄`__init__py`**           | **Python Package**                                         | Mark a directory as a Python package.      |
 
 ---
 
