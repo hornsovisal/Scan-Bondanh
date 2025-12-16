@@ -31,6 +31,13 @@ You must have Python 3.x installed. You may also need to run the tool with eleva
    cd Scan-Bondanh
 
    ```
+2. **Make sure Install Dependencies:**
+   All necessary external libraries are listed in `requirements.txt`. you can check by 
+   **Bash**
+
+   ```
+   python3 setup_verify.py
+   ```
 2. **Install Dependencies:**
    All necessary external libraries are listed in `requirements.txt`.
    **Bash**
