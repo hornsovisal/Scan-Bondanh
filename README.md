@@ -108,7 +108,6 @@ The project is organized as a professional Python package (`py_scan_tool`) to en
 | ------------------------------------ | ---------------------------------------------------------------- | ------------------------------------------ |
 | **📁`src/`**                 | **The Core Python Package**(Source Code)                   | Contains all executable logic.             |
 | ├── 📁`host_discovery/`         | Handles**Host Detection**using ICMP, ARP, and TCP methods. | host_discovery.py                          |
-| <<<<<<< HEAD                         |                                                                  |                                            |
 | ├── 📁`port_scanning/`          | Manages**Concurrency**and raw socket connections.          | `port_discovery.py`                      |
 | ├── 📁`reporting/`              | Handles**Report Generation**and file output.               | `report_manager.py`                      |
 | ├── 📁`IP_Finding/`             | handole find IP function                                         | ip_finding.py                              |
@@ -119,17 +118,6 @@ The project is organized as a professional Python package (`py_scan_tool`) to en
 | └── 📄`scan_results_YYMMDD.pdf` | Example output file.                                             |                                            |
 | **📄`requirements.txt`**     | **Dependencies**                                           | List of all required Python libraries.     |
 | **📄`__init__py`**           | **Python Package**                                         | Mark a directory as a Python package.      |
-
-=======
-| ├── 📁`port_scanning/`          | Manages**Concurrency**and raw socket connections.          | `port_discovery.py`                      |
-| ├── 📁`reporting/`              | Handles**Report Generation**and file output.               | `report_manager.py`                      |
-| ├── 📁`IP_Finding/`             | handole find IP function                                         | ip_finding.py                              |
-| ├── 📄**`main.py`**       | **Primary Entry Point (CLI or GUI)**                       | the entire scan process.                   |
-| 📁`config/`                        | **Tool Settings**                                          | External files to configure tool behavior. |
-| ├── 📄`default_ports.json`      | List of commonly scanned ports (e.g., 80, 443, 22).              |                                            |
-| **📁`reports/`**             | **Scan Output**                                            | Stores all generated scan reports.         |
-| └── 📄`scan_results_YYMMDD.pdf` | Example output file.                                             |                                            |
-| **📄`requirements.txt`**     | **Dependencies**                                           | List of all required Python libraries.     |
 | **📄`setup_verify.py`**      | **Python code**                                         | make sure all dependency install properly |
 
 ## 🤝 Contribution
