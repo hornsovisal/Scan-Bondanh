@@ -19,7 +19,7 @@
 
 ### Prerequisites
 
-- **Python 3.7 or higher** (Python 3.13+ recommended)
+- **Python 3 or higher** (Python 3.13+ recommended)
 - **pip** (Python package installer)
 - **Administrator/sudo privileges** (required for ARP scanning and raw socket operations)
 
